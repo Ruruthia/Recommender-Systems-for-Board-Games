@@ -1,0 +1,17 @@
+dagshub==0.1.8
+mlflow==1.20.2
+numpy==1.22.0
+pandas==1.3.5
+scipy==1.7.3
+tqdm==4.62.3
+surprise==0.1
+Cython==0.29.26
+dvc==2.3.0
+jupyter==1.0.0
+matplotlib==3.5.1
+pickleshare==0.7.5
+seaborn==0.11.2
+hyperopt==0.2.7
+scikit-learn==1.0.2
+requests==2.26.0
+setuptools==57.0.0

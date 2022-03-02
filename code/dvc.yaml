@@ -1,0 +1,60 @@
+stages:
+  features_filtering:
+    cmd: python data-pipeline/features_filtering.py
+    deps:
+    - data/bgg_GameItem.jl
+    outs:
+    - data/game_features.csv.gz
+    - data/game_features_names.csv.gz
+  data_slimming:
+    cmd: python data-pipeline/data_slimming.py
+    deps:
+    - data/bgg_RatingItem.jl
+    outs:
+    - data/slimmed_ratings.csv.gz
+  data_filtering:
+    cmd: python data-pipeline/data_filtering.py
+    deps:
+    - data/slimmed_ratings.csv.gz
+    outs:
+    - data/filtered_ratings.csv.gz
+  implicit_datasets_preparation:
+    cmd: python data-pipeline/implicit_datasets_preparation.py
+    deps:
+    - data/filtered_ratings.csv.gz
+    outs:
+    - data/ratings_all_implicit.csv.gz
+    - data/ratings_test_implicit.csv.gz
+    - data/ratings_train_implicit.csv.gz
+  explicit_datasets_preparation:
+    cmd: python data-pipeline/explicit_datasets_preparation.py
+    deps:
+    - data/filtered_ratings.csv.gz
+    outs:
+    - data/ratings_all_explicit.csv.gz
+    - data/ratings_test_explicit.csv.gz
+    - data/ratings_train_explicit.csv.gz
+  lightfm_interactions_preparation:
+    cmd: python data-pipeline/lightfm_interactions_preparation.py
+    deps:
+    - data/game_features.csv.gz
+    - data/game_features_names.csv.gz
+    - data/ratings_all_implicit.csv.gz
+    - data/ratings_test_implicit.csv.gz
+    - data/ratings_train_implicit.csv.gz
+    outs:
+    - data/dataset.pkl
+    - data/item_features.pkl
+    - data/test_interactions.npz
+    - data/train_interactions.npz
+  profiles_preparation:
+    cmd: python data-pipeline/profiles_preparation.py
+    deps:
+    - data/bgg_GameItem.jl
+    - data/dataset.pkl
+    - data/game_features_names.csv.gz
+    - data/ratings_train_implicit.csv.gz
+    outs:
+    - data/games_profiles.pkl
+    - data/test_users_profiles.pkl
+    - data/users_profiles.pkl

@@ -1,0 +1,136 @@
+schema: '2.0'
+stages:
+  features_filtering:
+    cmd: python data-pipeline/features_filtering.py
+    deps:
+    - path: data/bgg_GameItem.jl
+      md5: bac8716284e8c556caf310d4c6fdd919
+      size: 238602828
+    outs:
+    - path: data/game_features.csv.gz
+      md5: 68b7a3487f2cd5249255f7c42e390c89
+      size: 694633
+    - path: data/game_features_names.csv.gz
+      md5: 92c91c7da9332a4b2be8da88df2b9623
+      size: 744
+  data_slimming:
+    cmd: python data-pipeline/data_slimming.py
+    deps:
+    - path: data/bgg_RatingItem.jl
+      md5: cdde638f7c15c0794756815ff1ae4145
+      size: 6805632973
+    outs:
+    - path: data/slimmed_ratings.csv.gz
+      md5: 09b7d9878a1c3ba72e3efdae6a0d432c
+      size: 132744880
+  data_filtering:
+    cmd: python data-pipeline/data_filtering.py
+    deps:
+    - path: data/slimmed_ratings.csv.gz
+      md5: 09b7d9878a1c3ba72e3efdae6a0d432c
+      size: 132744880
+    outs:
+    - path: data/filtered_ratings.csv.gz
+      md5: 80d6ecf6bcfb82bf90a7b672a2e7f6a6
+      size: 106106321
+  dataset_splitting:
+    cmd: python data-pipeline/dataset_splitting.py
+    deps:
+    - path: data/filtered_ratings.csv.gz
+      md5: f008a6dcb74a0a58f7927a6e701e8750
+      size: 231461472
+    outs:
+    - path: data/ratings_test.csv.gz
+      md5: 8b1fdf200870e8baba64337b036a4afc
+      size: 19624693
+    - path: data/ratings_train.csv.gz
+      md5: 6d0c628e8edc645411bc9a0cf6aade42
+      size: 211894025
+  implicit_datasets_preparation:
+    cmd: python data-pipeline/implicit_datasets_preparation.py
+    deps:
+    - path: data/filtered_ratings.csv.gz
+      md5: 80d6ecf6bcfb82bf90a7b672a2e7f6a6
+      size: 106106321
+    outs:
+    - path: data/ratings_all_implicit.csv.gz
+      md5: a04ff8ed44e794298fa3094db17d8c3d
+      size: 88261574
+    - path: data/ratings_test_implicit.csv.gz
+      md5: 99acfb8f5d5fbd8e5a11b1dd5554c432
+      size: 8678646
+    - path: data/ratings_train_implicit.csv.gz
+      md5: 929cb02de5fa8fb0cc54719797bd8680
+      size: 81361565
+  explicit_datasets_preparation:
+    cmd: python data-pipeline/explicit_datasets_preparation.py
+    deps:
+    - path: data/filtered_ratings.csv.gz
+      md5: 80d6ecf6bcfb82bf90a7b672a2e7f6a6
+      size: 106106321
+    outs:
+    - path: data/ratings_all_explicit.csv.gz
+      md5: f175afb000dbbfee23e2648c6d115784
+      size: 71049199
+    - path: data/ratings_test_explicit.csv.gz
+      md5: 9d54a46dd42868dedd22efb4c3921e3b
+      size: 7024575
+    - path: data/ratings_train_explicit.csv.gz
+      md5: 800f3d4e04c4cc36e38a7ad9cb2a0297
+      size: 65320034
+  lightfm_interactions_preparation:
+    cmd: python data-pipeline/lightfm_interactions_preparation.py
+    deps:
+    - path: data/game_features.csv.gz
+      md5: 68b7a3487f2cd5249255f7c42e390c89
+      size: 694633
+    - path: data/game_features_names.csv.gz
+      md5: 92c91c7da9332a4b2be8da88df2b9623
+      size: 744
+    - path: data/ratings_all_implicit.csv.gz
+      md5: a04ff8ed44e794298fa3094db17d8c3d
+      size: 88261574
+    - path: data/ratings_test_implicit.csv.gz
+      md5: 99acfb8f5d5fbd8e5a11b1dd5554c432
+      size: 8678646
+    - path: data/ratings_train_implicit.csv.gz
+      md5: 929cb02de5fa8fb0cc54719797bd8680
+      size: 81361565
+    outs:
+    - path: data/dataset.pkl
+      md5: 2c676122ab9ffb7be11fc3a53955dce9
+      size: 6677589
+    - path: data/item_features.pkl
+      md5: fd01e820fa36770788da8889ca51e461
+      size: 195397
+    - path: data/test_interactions.npz
+      md5: b59ccc64c5b2b044e6d0d06e7c932ea1
+      size: 3553186
+    - path: data/train_interactions.npz
+      md5: 103dcff3e6d323f9c2ce6490ec5dac36
+      size: 33202306
+  profiles_preparation:
+    cmd: python data-pipeline/profiles_preparation.py
+    deps:
+    - path: data/bgg_GameItem.jl
+      md5: bac8716284e8c556caf310d4c6fdd919
+      size: 238602828
+    - path: data/dataset.pkl
+      md5: 2c676122ab9ffb7be11fc3a53955dce9
+      size: 6677589
+    - path: data/game_features_names.csv.gz
+      md5: 92c91c7da9332a4b2be8da88df2b9623
+      size: 744
+    - path: data/ratings_train_implicit.csv.gz
+      md5: 929cb02de5fa8fb0cc54719797bd8680
+      size: 81361565
+    outs:
+    - path: data/games_profiles.pkl
+      md5: 40e0033cb3088c23141e010c295d5fb4
+      size: 60065950
+    - path: data/test_users_profiles.pkl
+      md5: 50d47a11d17f2263938a41bd3ffe36cb
+      size: 44392137
+    - path: data/users_profiles.pkl
+      md5: 4f9c765940f7ce5b83c6bb6a65ddf733
+      size: 147974553
